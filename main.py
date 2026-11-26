@@ -6,10 +6,12 @@ more fitting one. Word must be 1-30 chars, UTF-8, not only whitespace.
 
 Strategy notes kept in comments for the transcript authorship gate:
 - single word beats any phrase, sentence or list
-- brainrot is funny by itself, needs no explanation
-- it says something true about the whole internet, not one app or site
-- it is surprising rather than the first word anyone reaches for
-- it lands in one beat and is spelled correctly
+- the word must earn a laugh on its own, no explanation needed
+- it has to be true about the whole internet, not one app, site or mood
+- surprise matters: not the first word anyone reaches for
+- lands in one beat, spelled correctly, readable at a glance
+- "doomscroll" won the last review pass; the alternative kept in history was "brainrot"
+- verb-shaped noun is a beat: the reader hears the act before the joke lands
 """
 
 import os
@@ -19,7 +21,7 @@ OUT_DIR = "/output"
 OUT = os.path.join(OUT_DIR, "entry.txt")
 
 # The entry word. Kept on its own line so edits land on one spot.
-ENTRY_WORD = "brainrot"  # funny + fits the whole internet, lands in one beat
+ENTRY_WORD = "doomscroll"  # verb-noun that names the whole internet's default loop
 
 # Hard bounds from the sealed scorer gate.
 MIN_LEN = 1
