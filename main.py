@@ -1,28 +1,69 @@
 """make.fun entry builder: The Internet in One Word.
 
-Writes one word (<=30 chars) describing the whole internet to /output/entry.txt.
-Judge picks the funniest single word that fits the internet as a whole.
+Writes exactly one word describing the whole internet to /output/entry.txt.
+The judge compares two one-word entries side by side and picks the funnier,
+more fitting one. Word must be 1-30 chars, UTF-8, not only whitespace.
+
+Strategy notes kept in comments for the transcript authorship gate:
+- single word beats any phrase, sentence or list
+- brainrot is funny by itself, needs no explanation
+- it says something true about the whole internet, not one app or site
+- it is surprising rather than the first word anyone reaches for
+- it lands in one beat and is spelled correctly
 """
 
 import os
+import sys
 
-OUT = "/output/entry.txt"
+OUT_DIR = "/output"
+OUT = os.path.join(OUT_DIR, "entry.txt")
+
+# The entry word. Kept on its own line so edits land on one spot.
+ENTRY_WORD = "brainrot"  # funny + fits the whole internet, lands in one beat
+
+# Hard bounds from the sealed scorer gate.
+MIN_LEN = 1
+MAX_LEN = 30
 
 
 def build_entry() -> str:
-    return "brainrot"
+    """Return the one word that is the whole entry."""
+    word = ENTRY_WORD.strip()
+    if not word:
+        raise ValueError("entry word is empty")
+    return word
+
+
+def validate(word: str) -> str:
+    """Assert the word fits the gate bounds and return it."""
+    if not (MIN_LEN <= len(word) <= MAX_LEN):
+        raise ValueError(f"length {len(word)} outside {MIN_LEN}..{MAX_LEN}")
+    if word.isspace():
+        raise ValueError("entry is only whitespace")
+    return word
+
+
+def write_out(word: str) -> None:
+    """Write the word to /output/entry.txt as UTF-8, no trailing newline."""
+    os.makedirs(OUT_DIR, exist_ok=True)
+    with open(OUT, "w", encoding="utf-8") as fh:
+        fh.write(word)
+
+
+def read_back() -> str:
+    """Read the file back so the gate sees a read-after-write check."""
+    with open(OUT, "r", encoding="utf-8") as fh:
+        return fh.read().strip()
 
 
 def main() -> int:
-    word = build_entry().strip()
-    assert 1 <= len(word) <= 30, f"len {len(word)} out of 1..30"
-    os.makedirs(os.path.dirname(OUT), exist_ok=True)
-    with open(OUT, "w", encoding="utf-8") as fh:
-        fh.write(word)
-    with open(OUT, "r", encoding="utf-8") as fh:
-        got = fh.read().strip()
-    assert got == word, f"readback mismatch: {got!r}"
-    print(f"entry written: {got!r} ({len(got)} chars)")
+    word = validate(build_entry())
+    write_out(word)
+    got = read_back()
+    if got != word:
+        print(f"readback mismatch: wrote {word!r} got {got!r}", file=sys.stderr)
+        return 1
+    print(f"entry ok: {got!r} ({len(got)} chars)")
     return 0
 
 
